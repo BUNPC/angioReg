@@ -22,7 +22,7 @@ function varargout = angioReg(varargin)
 
 % Edit the above text to modify the response to help angioReg
 
-% Last Modified by GUIDE v2.5 02-Mar-2018 14:28:52
+% Last Modified by GUIDE v2.5 26-Jul-2019 10:55:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,8 +81,8 @@ function slider_TPM_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
 global Data
+
 if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
     Tz = size(Data.TTPM,1);
 else
@@ -275,6 +275,10 @@ function menu_loaddata_Callback(hObject, eventdata, handles)
 global Data
 
 [filename,pathname] = uigetfile({'*.mat;*.tiff;*.tif'},'Please select TPM angiogram');
+if filename == 0
+    return
+end
+h = waitbar(0,'Please wait... loading the Angiogram1');
 [pathstr,name,ext] = fileparts(filename);
 if strcmp(ext,'.mat')
     temp = load([pathname filename]);
@@ -292,9 +296,18 @@ elseif strcmp(ext,'.tiff') || strcmp(ext,'.tif')
         end
     end
     TPM = angio; 
+    maxValue = max(TPM(:));
+    minValue = min(TPM(:));
+    set(handles.edit_TPMmin,'String',num2str(minValue));
+    set(handles.edit_TPMmax,'String',num2str(maxValue));
 end
+close(h);
 
 [filename,pathname] = uigetfile({'*.mat;*.tiff;*.tif'},'Please select OCT angiogram');
+if filename == 0
+    return
+end
+h = waitbar(0,'Please wait... loading the Angiogram2');
 [pathstr,name,ext] = fileparts(filename);
 if strcmp(ext,'.mat')
     temp = load([pathname filename]);
@@ -312,24 +325,71 @@ elseif strcmp(ext,'.tiff') || strcmp(ext,'.tif')
         end
     end
     OCT = angio; 
+    maxValue = max(OCT(:));
+    minValue = min(OCT(:));
+    set(handles.edit_OCTmin,'String',num2str(minValue));
+    set(handles.edit_OCTmax,'String',num2str(maxValue));
 end
+close(h);
+
 Data.TPM = TPM;
 Data.OCT = OCT;
 
-Tz = size(Data.TPM,1);
-Oz = size(Data.OCT,1);
+[Tz,Tx,Ty] = size(Data.TPM);
+[Oz,Ox,Oy] = size(Data.OCT);
 
 set(handles.slider_TPM,'max',Tz);
 set(handles.slider_TPM,'min',1);
 set(handles.slider_TPM,'Value',Tz);
 set(handles.slider_TPM,'SliderStep',[1/(Tz-1), 10/(Tz-1)]);
 
-if Oz > 1
-    set(handles.slider_OCT,'max',Oz);
-    set(handles.slider_OCT,'min',1);
-    set(handles.slider_OCT,'Value',Oz);
-    set(handles.slider_OCT,'SliderStep',[1/(Oz-1), 10/(Oz-1)]);
-end
+set(handles.slider_TIX,'max',Tx);
+set(handles.slider_TIX,'min',1);
+set(handles.slider_TIX,'Value',1);
+set(handles.slider_TIX,'SliderStep',[1/(Tx-1), 10/(Tx-1)]);
+
+set(handles.slider_TIY,'max',Ty);
+set(handles.slider_TIY,'min',1);
+set(handles.slider_TIY,'Value',Ty);
+set(handles.slider_TIY,'SliderStep',[1/(Ty-1), 10/(Ty-1)]);
+
+set(handles.slider_OCT,'max',Oz);
+set(handles.slider_OCT,'min',1);
+set(handles.slider_OCT,'Value',Oz);
+set(handles.slider_OCT,'SliderStep',[1/(Oz-1), 10/(Oz-1)]);
+
+set(handles.slider_AX,'max',Ox);
+set(handles.slider_AX,'min',1);
+set(handles.slider_AX,'Value',1);
+set(handles.slider_AX,'SliderStep',[1/(Ox-1), 10/(Ox-1)]);
+
+set(handles.slider_AY,'max',Oy);
+set(handles.slider_AY,'min',1);
+set(handles.slider_AY,'Value',Oy);
+set(handles.slider_AY,'SliderStep',[1/(Oy-1), 10/(Oy-1)]);
+
+set(handles.edit_a1XMIP,'String',num2str(Tx));
+set(handles.edit_a1YMIP,'String',num2str(Ty));
+
+set(handles.edit_a2XMIP,'String',num2str(Ox));
+set(handles.edit_a2YMIP,'String',num2str(Oy));
+
+minTPM = min(TPM(:));
+maxTPM = max(TPM(:));
+minOCT = min(OCT(:));
+maxOCT = max(OCT(:));
+
+set(handles.edit_TPMmin,'String',num2str(minTPM));
+set(handles.edit_TPMmax,'String',num2str(maxTPM));
+set(handles.edit_OCTmin,'String',num2str(minOCT));
+set(handles.edit_OCTmax,'String',num2str(maxOCT));
+
+set(handles.text_TX,'String',['x -> x(1' '-' num2str(Tx) ')']);
+set(handles.text_TY,'String',['y -> y(1' '-' num2str(Ty) ')']);
+set(handles.text_TZ,'String',['z -> z(1' '-' num2str(Tz) ')']);
+set(handles.text_AX,'String',['x -> x(1' '-' num2str(Ox) ')']);
+set(handles.text_AY,'String',['y -> y(1' '-' num2str(Oy) ')']);
+set(handles.text_AZ,'String',['z -> z(1' '-' num2str(Oz) ')']);
 
 draw(hObject, eventdata, handles);
 
@@ -355,7 +415,7 @@ global Data
 
 % TMPimage = squeeze(max(Data.TPM(TPMstartframe:TPMendframe,:,:),[],1));
 if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
-    Tz = size(Data.TTPM,1);
+    [Tz,Tx,Ty] = size(Data.TTPM);
     TPMstartframe = round(str2double(get(handles.edit_TPMframeno,'String')));
     TPMstartframe = min(max(TPMstartframe,1),Tz);
     TPMmip = round(str2double(get(handles.edit_TPMMIP,'String')));
@@ -363,7 +423,7 @@ if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
     TPMendframe = min(max(TPMendframe,TPMstartframe),Tz);
     TPMimage = squeeze(max(Data.TTPM(TPMstartframe:TPMendframe,:,:),[],1));
 else
-    Tz = size(Data.TPM,1);
+    [Tz,Tx,Ty] = size(Data.TPM);
     TPMstartframe = round(str2double(get(handles.edit_TPMframeno,'String')));
     TPMstartframe = min(max(TPMstartframe,1),Tz);
     TPMmip = round(str2double(get(handles.edit_TPMMIP,'String')));
@@ -371,8 +431,18 @@ else
     TPMendframe = min(max(TPMendframe,TPMstartframe),Tz);
     TPMimage = squeeze(max(Data.TPM(TPMstartframe:TPMendframe,:,:),[],1));
 end
+TI_Xstart = round(str2double(get(handles.edit_a1Xstart,'String')));
+TI_Xstart = min(max(TI_Xstart,1),Tx);
+TI_XMIP = round(str2double(get(handles.edit_a1XMIP,'String')));
+TI_xend = TI_Xstart+TI_XMIP;
+TI_xend = min(max(TI_xend,TI_Xstart),Tx);
+TI_Ystart = round(str2double(get(handles.edit_a1Ystart,'String')));
+TI_Ystart = min(max(TI_Ystart,1),Ty);
+TI_YMIP = round(str2double(get(handles.edit_a1YMIP,'String')));
+TI_yend = TI_Ystart+TI_YMIP;
+TI_yend = min(max(TI_yend,TI_Ystart),Tx);
 if get(handles.radiobutton_TOCT,'Value') == 1 && isfield(Data,'TOCT')
-    Oz = size(Data.TOCT,1);
+    [Oz,Ox,Oy] = size(Data.TOCT);
     OCTstartframe = round(str2double(get(handles.edit_OCTframeno,'String')));
     OCTstartframe = min(max(OCTstartframe,1),Oz);
     OCTmip = round(str2double(get(handles.edit_OCTMIP,'String')));
@@ -380,7 +450,7 @@ if get(handles.radiobutton_TOCT,'Value') == 1 && isfield(Data,'TOCT')
     OCTendframe = min(max(OCTendframe,OCTstartframe),Oz);
     OCTimage = squeeze(max(Data.TOCT(OCTstartframe:OCTendframe,:,:),[],1));
 else
-    Oz = size(Data.OCT,1);
+    [Oz,Ox,Oy] = size(Data.OCT);
     OCTstartframe = round(str2double(get(handles.edit_OCTframeno,'String')));
     OCTstartframe = min(max(OCTstartframe,1),Oz);
     OCTmip = round(str2double(get(handles.edit_OCTMIP,'String')));
@@ -388,66 +458,142 @@ else
     OCTendframe = min(max(OCTendframe,OCTstartframe),Oz);
     OCTimage = squeeze(max(Data.OCT(OCTstartframe:OCTendframe,:,:),[],1));
 end
+A_Xstart = round(str2double(get(handles.edit_a2Xstart,'String')));
+A_Xstart = min(max(A_Xstart,1),Ox);
+A_XMIP = round(str2double(get(handles.edit_a2XMIP,'String')));
+A_xend = A_Xstart+A_XMIP;
+A_xend = min(max(A_xend,A_Xstart),Ox);
+A_Ystart = round(str2double(get(handles.edit_a2Ystart,'String')));
+A_Ystart = min(max(A_Ystart,1),Oy);
+A_YMIP = round(str2double(get(handles.edit_a2YMIP,'String')));
+A_yend = A_Ystart+A_YMIP;
+A_yend = min(max(A_yend,A_Ystart),Ox);
 
+minTPM = str2double(get(handles.edit_TPMmin,'String'));
+maxTPM = str2double(get(handles.edit_TPMmax,'String'));
+minOCT = str2double(get(handles.edit_OCTmin,'String'));
+maxOCT = str2double(get(handles.edit_OCTmax,'String'));
 
 axes(handles.axes1)
 colormap('gray');
-h = imagesc(TPMimage);
-axis image
+if get(handles.radiobutton_TPMlogScale,'Value')
+    h = imagesc(log(TPMimage),[log(minTPM) log(maxTPM)]);
+else
+    h = imagesc(TPMimage,[minTPM maxTPM]);
+end
+axis image;
+xlim([TI_Xstart TI_xend]);
+ylim([TI_Ystart TI_yend]);
+
+c = 'r';
+fs = 14;
+cp = 'c';
+fsp = 20;
 set(h, 'ButtonDownFcn', {@axes1_ButtonDown, handles});
-if isfield(Data,'TPMpoints')
+if (get(handles.radiobutton_TTPM,'Value') == 1) & isfield(Data,'TTPMpoints')
+    for u = 1:size(Data.TTPMpoints,1)
+        if TPMstartframe == Data.TTPMpoints(u,1)
+            hpt = text(Data.TTPMpoints(u,3),Data.TTPMpoints(u,2),num2str(u),'Color',c,'FontSize',fs);
+            set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+        end
+    end
+elseif isfield(Data,'TPMpoints')
     for u = 1:size(Data.TPMpoints,1)
         if TPMstartframe == Data.TPMpoints(u,1)
-            hpt = text(Data.TPMpoints(u,3),Data.TPMpoints(u,2),num2str(u),'Color','g','FontSize',10);
+            hpt = text(Data.TPMpoints(u,3),Data.TPMpoints(u,2),num2str(u),'Color',c,'FontSize',fs);
             set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
         end
     end
 end
 
 if isfield(Data,'ptstoCompare')
-    for u = 1:size(Data.ptstoCompare,1)
-        if TPMstartframe == Data.ptstoCompare(u,1)
-            text(Data.ptstoCompare(u,3),Data.ptstoCompare(u,2),num2str(u),'Color','b','FontSize',14);
-            %%set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+    if get(handles.radiobutton_TTPM,'Value') == 1
+        for u = 1:size(Data.TptstoCompare,1)
+            if TPMstartframe == Data.TptstoCompare(u,1)
+                text(Data.TptstoCompare(u,3),Data.TptstoCompare(u,2),'*','Color',cp,'FontSize',fsp);
+                %%set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+            end
+        end
+    else
+        for u = 1:size(Data.ptstoCompare,1)
+            if TPMstartframe == Data.ptstoCompare(u,1)
+                text(Data.ptstoCompare(u,3),Data.ptstoCompare(u,2),'*','Color',cp,'FontSize',fsp);
+                %%set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+            end
         end
     end
 end
 
 
 
+if  get(handles.radiobutton_overlayTPM,'Value') == 1
+%     if (get(handles.radiobutton_TOCT,'Value') == 1 
+        img2 = double(OCTimage);
+        img2 = 1-exp(-4*img2/max(img2(:)));
+        green = cat(3, zeros(size(img2)),ones(size(img2)), zeros(size(img2))); 
+        hold on 
+        h = imshow(green); 
+        hold off
+        set(h, 'AlphaData', img2) 
+%     end
+end
+
+
 axes(handles.axes2)
 colormap('gray');
-% h = imagesc(log(OCTimage));
-h = imagesc((OCTimage));
-axis image
+if get(handles.radiobutton_OCTlogScale,'Value')
+    h = imagesc(log(OCTimage),[log(minOCT) log(maxOCT)]);
+else
+    h = imagesc(OCTimage,[minOCT maxOCT]);
+end
+axis image;
+xlim([A_Xstart A_xend]);
+ylim([A_Ystart A_yend]);
+
 set(h, 'ButtonDownFcn', {@axes2_ButtonDown, handles});
-if isfield(Data,'OCTpoints')
+if (get(handles.radiobutton_TOCT,'Value') == 1) & isfield(Data,'TOCTpoints')
+     for u = 1:size(Data.TOCTpoints,1)
+        if OCTstartframe == Data.TOCTpoints(u,1)
+            hpt = text(Data.TOCTpoints(u,3),Data.TOCTpoints(u,2),num2str(u),'Color',c,'FontSize',fs);
+%             set(hpt,'ButtonDownFcn', sprintf('OCT_deletepoint(%d)',u));
+        end
+    end
+elseif isfield(Data,'OCTpoints')
     for u = 1:size(Data.OCTpoints,1)
         if OCTstartframe == Data.OCTpoints(u,1)
-            hpt = text(Data.OCTpoints(u,3),Data.OCTpoints(u,2),num2str(u),'Color','g','FontSize',10);
+            hpt = text(Data.OCTpoints(u,3),Data.OCTpoints(u,2),num2str(u),'Color',c,'FontSize',fs);
             set(hpt,'ButtonDownFcn', sprintf('OCT_deletepoint(%d)',u));
         end
     end
 end
 
 if isfield(Data,'ptstoCompare')
-    for u = 1:size(Data.ptstoCompare,1)
-        if TPMstartframe == Data.ptstoCompare(u,1)
-            text(Data.ptstoCompare(u,3),Data.ptstoCompare(u,2),num2str(u),'Color','b','FontSize',14);
-            %%set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+    if (get(handles.radiobutton_TOCT,'Value') == 0) 
+        for u = 1:size(Data.AptstoCompare,1)
+            if OCTstartframe == Data.AptstoCompare(u,1)
+                text(Data.AptstoCompare(u,3),Data.AptstoCompare(u,2),'*','Color',cp,'FontSize',fsp);
+                %%set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+            end
+        end
+    else
+        for u = 1:size(Data.ptstoCompare,1)
+            if OCTstartframe == Data.ptstoCompare(u,1)
+                text(Data.ptstoCompare(u,3),Data.ptstoCompare(u,2),'*','Color',cp,'FontSize',fsp);
+                %%set(hpt,'ButtonDownFcn', sprintf('TPM_deletepoint(%d)',u));
+            end
         end
     end
 end
 
-if (get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1) && get(handles.radiobutton_overlayTPM,'Value') == 1
-    img2 = double(TPMimage);
-    img2 = 1-exp(-4*img2/max(img2(:)));
-    green = cat(3, zeros(size(img2)),ones(size(img2)), zeros(size(img2))); 
-    hold on 
-    h = imshow(green); 
-    hold off
-    set(h, 'AlphaData', img2) 
-end
+% if (get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1) && get(handles.radiobutton_overlayTPM,'Value') == 1
+%     img2 = double(TPMimage);
+%     img2 = 1-exp(-4*img2/max(img2(:)));
+%     green = cat(3, zeros(size(img2)),ones(size(img2)), zeros(size(img2))); 
+%     hold on 
+%     h = imshow(green); 
+%     hold off
+%     set(h, 'AlphaData', img2) 
+% end
 
 Data.handles =  handles;
 Data.hObject =  hObject;
@@ -462,20 +608,39 @@ pts = round(get(parent, 'CurrentPoint'));
 y = pts(1,1);
 x = pts(1,2);
 z = round(str2double(get(handles.edit_TPMframeno,'String')));
-
-if get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1
-    if isfield(Data,'ptstoCompare')
-        Data.ptstoCompare = [Data.ptstoCompare; z x y];
-    else
-        Data.ptstoCompare = [z x y];
-    end
-else
+if get(handles.radiobutton_addpoint,'Value')
     if isfield(Data,'TPMpoints')
         Data.TPMpoints = [Data.TPMpoints; z x y];
     else
         Data.TPMpoints = [z x y];
     end
+elseif get(handles.radiobutton_testPoint,'Value') 
+%     && (get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1)
+%     if isfield(Data,'ptstoCompare')
+%         Data.ptstoCompare = [Data.ptstoCompare; z x y];
+%     else
+        Data.ptstoCompare = [z x y];
+        if isfield(Data,'TransformT2A')
+            TRANSFORM = Data.TransformT2A;
+            Data.AptstoCompare = round(TRANSFORM.b * Data.ptstoCompare * TRANSFORM.T + TRANSFORM.c(1,:));
+%             TRANSFORM = Data.TransformA2T;
+            Data.TptstoCompare = round(TRANSFORM.b * Data.ptstoCompare * TRANSFORM.T + TRANSFORM.c(1,:));
+        end
+%     end
 end
+% if get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1
+%     if isfield(Data,'ptstoCompare')
+%         Data.ptstoCompare = [Data.ptstoCompare; z x y];
+%     else
+%         Data.ptstoCompare = [z x y];
+%     end
+% else
+%     if isfield(Data,'TPMpoints')
+%         Data.TPMpoints = [Data.TPMpoints; z x y];
+%     else
+%         Data.TPMpoints = [z x y];
+%     end
+% end
 draw(hObject, eventdata, handles);
 
 function axes2_ButtonDown(hObject, eventdata, handles)
@@ -487,19 +652,39 @@ pts = round(get(parent, 'CurrentPoint'));
 y = pts(1,1);
 x = pts(1,2);
 z = round(str2double(get(handles.edit_OCTframeno,'String')));
-if get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1
-    if isfield(Data,'ptstoCompare')
-        Data.ptstoCompare = [Data.ptstoCompare; z x y];
-    else
-        Data.ptstoCompare = [z x y];
-    end
-else
+if get(handles.radiobutton_addpoint,'Value')
     if isfield(Data,'OCTpoints')
         Data.OCTpoints = [Data.OCTpoints; z x y];
     else
         Data.OCTpoints = [z x y];
-    end
+    end    
+elseif get(handles.radiobutton_testPoint,'Value') 
+%     && (get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1)
+%     if isfield(Data,'ptstoCompare')
+%         Data.ptstoCompare = [Data.ptstoCompare; z x y];
+%     else
+        Data.ptstoCompare = [z x y];
+        if isfield(Data,'TransformT2A')
+            TRANSFORM = Data.TransformA2T;
+            Data.TptstoCompare = round(TRANSFORM.b * Data.ptstoCompare * TRANSFORM.T + TRANSFORM.c(1,:));
+            TRANSFORM = Data.TransformT2A;
+            Data.AptstoCompare = round(TRANSFORM.b * Data.ptstoCompare * TRANSFORM.T + TRANSFORM.c(1,:));
+        end
+%     end
 end
+% if get(handles.radiobutton_TOCT,'Value') == 1 || get(handles.radiobutton_TTPM,'Value') == 1
+%     if isfield(Data,'ptstoCompare')
+%         Data.ptstoCompare = [Data.ptstoCompare; z x y];
+%     else
+%         Data.ptstoCompare = [z x y];
+%     end
+% else
+%     if isfield(Data,'OCTpoints')
+%         Data.OCTpoints = [Data.OCTpoints; z x y];
+%     else
+%         Data.OCTpoints = [z x y];
+%     end
+% end
 draw(hObject, eventdata, handles);
 
 
@@ -572,14 +757,15 @@ function tools_clearCpoints_Callback(hObject, eventdata, handles)
 global Data
 
 Data.ptstoCompare = [];
-
+Data.OCTpoints = [];
+Data.TPMpoints = [];
 draw(hObject, eventdata, handles);
 
 
 
 % --------------------------------------------------------------------
-function tools_registerOCTtoTPM_Callback(hObject, eventdata, handles)
-% hObject    handle to tools_registerOCTtoTPM (see GCBO)
+function tools_registerAngio2to1_Callback(hObject, eventdata, handles)
+% hObject    handle to tools_registerAngio2to1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -610,6 +796,7 @@ if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
             end
         end
     end
+    Data.TTPMpoints = round(TRANSFORM.b * Data.TPMpoints * TRANSFORM.T + TRANSFORM.c(1,:));
     Data.TOCT = img;
 end
 
@@ -624,7 +811,12 @@ function radiobutton_TOCT_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of radiobutton_TOCT
 global Data
-
+if ~ isfield(Data,'TOCT')
+    h = msgbox('Please register Angiogram2 to angiogram1 before using this radio button');
+    uiwait(h);
+    set(handles.radiobutton_TOCT,'Value',0);
+    return
+end
 OCTframeno = str2double(get(handles.edit_OCTframeno,'String'));
 Oz = size(Data.OCT,1);
 OzT = size(Data.TOCT,1);
@@ -685,8 +877,8 @@ draw(hObject, eventdata, handles);
 
 
 % --------------------------------------------------------------------
-function tools_registerTPMtoOCT_Callback(hObject, eventdata, handles)
-% hObject    handle to tools_registerTPMtoOCT (see GCBO)
+function tools_registerAngio1to2_Callback(hObject, eventdata, handles)
+% hObject    handle to tools_registerAngio1to2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -718,6 +910,7 @@ if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
         end
     end
     Data.TTPM = img;
+    Data.TOCTpoints = round(TRANSFORM.b * Data.OCTpoints * TRANSFORM.T + TRANSFORM.c(1,:));
 end
 
 draw(hObject, eventdata, handles);
@@ -732,7 +925,12 @@ function radiobutton_TTPM_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of radiobutton_TTPM
 
 global Data
-
+if ~ isfield(Data,'TTPM')
+    h = msgbox('Please register Angiogram1 to angiogram2 before using this radio button');
+    uiwait(h);
+    set(handles.radiobutton_TTPM,'Value',0);
+    return
+end
 TPMframeno = str2double(get(handles.edit_OCTframeno,'String'));
 Tz = size(Data.TPM,1);
 TzT = size(Data.TTPM,1);
@@ -762,10 +960,10 @@ function tools_savepoints_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global Data
-OCTpoints = Data.OCTpoints;
-TPMpoints = Data.TPMpoints;
+Angio2pts = Data.OCTpoints;
+Angio1pts = Data.TPMpoints;
 [filename,pathname] = uiputfile('.mat','Save points as');
-save([pathname filename],'OCTpoints','TPMpoints');
+save([pathname filename],'Angio1pts','Angio2pts');
 
 % --------------------------------------------------------------------
 function tools_SaveTOCT_Callback(hObject, eventdata, handles)
@@ -774,6 +972,11 @@ function tools_SaveTOCT_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global Data
+if ~ isfield(Data,'TOCT')
+    h = msgbox('Angiogram2 was not tranformed to Angiogram1');
+    uiwait(h);
+    return
+end
 angio = Data.TOCT; 
 [filename,pathname] = uiputfile('.mat','Save transformed OCT as');
 save([pathname filename],'angio');
@@ -785,9 +988,14 @@ function tools_TTPM_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global Data
+if ~ isfield(Data,'TTPM')
+    h = msgbox('Angiogram1 was not tranformed to Angiogram2');
+    uiwait(h);
+    return
+end
 angio = Data.TTPM; 
 [filename,pathname] = uiputfile('.mat','Save transformed TPM as');
-save([pathname filename],'angio','-v7.3');
+save([pathname filename],'angio');
 
 
 % --- Executes on button press in radiobutton_overlayTPM.
@@ -808,39 +1016,721 @@ function Untitled_3_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in pushbutton_rot90clockVol1.
-function pushbutton_rot90clockVol1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_rot90clockVol1 (see GCBO)
+% --------------------------------------------------------------------
+function loadPoints_Callback(hObject, eventdata, handles)
+% hObject    handle to loadPoints (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 global Data
-Data.TPM = permute(Data.TPM,[2 3 1]);
-Data.TPM = imrotate(Data.TPM,-90);
-Data.TPM = permute(Data.TPM,[3 1 2]);
+[pointFile,pointPath] = uigetfile('*.mat');
+savedPoints = load(fullfile(pointPath,pointFile));
+Data.OCTpoints = savedPoints.OCTpoints;
+Data.TPMpoints = savedPoints.TPMpoints;
 draw(hObject, eventdata, handles);
 
 
-% --- Executes on button press in pushbutton_rot90anticlockVol1.
-function pushbutton_rot90anticlockVol1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_rot90anticlockVol1 (see GCBO)
+% --- Executes on button press in radiobutton_TPMlogScale.
+function radiobutton_TPMlogScale_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton_TPMlogScale (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global Data
-Data.TPM = permute(Data.TPM,[2 3 1]);
-Data.TPM = imrotate(Data.TPM,90);
-Data.TPM = permute(Data.TPM,[3 1 2]);
+% Hint: get(hObject,'Value') returns toggle state of radiobutton_TPMlogScale
 draw(hObject, eventdata, handles);
 
-
-% --- Executes on button press in pushbutton_transposeVol1.
-function pushbutton_transposeVol1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_transposeVol1 (see GCBO)
+% --- Executes on button press in radiobutton_OCTlogScale.
+function radiobutton_OCTlogScale_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton_OCTlogScale (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Hint: get(hObject,'Value') returns toggle state of radiobutton_OCTlogScale
+draw(hObject, eventdata, handles);
+
+
+function edit_TPMmin_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_TPMmin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_TPMmin as text
+%        str2double(get(hObject,'String')) returns contents of edit_TPMmin as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_TPMmin_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_TPMmin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_TPMmax_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_TPMmax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_TPMmax as text
+%        str2double(get(hObject,'String')) returns contents of edit_TPMmax as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_TPMmax_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_TPMmax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_OCTmin_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_OCTmin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_OCTmin as text
+%        str2double(get(hObject,'String')) returns contents of edit_OCTmin as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_OCTmin_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_OCTmin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_OCTmax_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_OCTmax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_OCTmax as text
+%        str2double(get(hObject,'String')) returns contents of edit_OCTmax as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_OCTmax_CreateFcn(hObject, ~, handles)
+% hObject    handle to edit_OCTmax (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton_registerAngiograms.
+function pushbutton_registerAngiograms_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_registerAngiograms (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 global Data
 
-Data.TPM = permute(Data.TPM,[1 3 2]);
+if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
+    Ts = size(Data.TPMpoints,1);
+    Os = size(Data.OCTpoints,1);
+    S = min(Ts,Os);
+    TPMpoints = Data.TPMpoints(1:S,:);
+    OCTpoints = Data.OCTpoints(1:S,:);
+    [D,Z,TRANSFORM] = procrustes(OCTpoints, TPMpoints);
+    Data.TransformT2A = TRANSFORM;
+    img = zeros(size(Data.TPM));
+    [Sz,Sx,Sy] = size(img);
+    [Az,Ax,Ay] = size(Data.OCT);
+%     TRANSFORM = Data.Transform;
+    tic
+%     for u = 1:Sx
+%         for v = 1:Sy
+%             for w=1:Sz
+%                 idx = round(TRANSFORM.b * [w u v] * TRANSFORM.T + TRANSFORM.c(1,:));
+%                 if idx(1) < 1 || idx(1) > Az || idx(2) < 1 || idx(2) > Ax || idx(3) < 1 || idx(3) > Ay
+%                     img(w,u,v) = 0;
+%                 else
+% %                     img(w,u,v) = Data.OCT(min(max(idx(1),1),Az),min(max(idx(2),1),Ax),min(max(idx(3),1),Ay));
+%                       img(w,u,v) = Data.OCT(idx(1),idx(2),idx(3));
+%                 end
+%             end
+%         end
+%     end
+
+
+    [zz,xx,yy] = meshgrid(1:Sz,1:Sx,1:Sy);
+    idx = [zz(:) xx(:) yy(:)];
+    tidx = round(TRANSFORM.b * idx * TRANSFORM.T + TRANSFORM.c(1,:));
+    kidx = find(tidx(:,1) >= 1 & tidx(:,1) <= Az & tidx(:,2) >= 1 & tidx(:,2) <= Ax & tidx(:,3) >= 1 & tidx(:,3) <= Ay);
+    OCTidx = sub2ind(size(Data.OCT),tidx(kidx,1),tidx(kidx,2),tidx(kidx,3));
+    TOCTidx = sub2ind(size(img),idx(kidx,1),idx(kidx,2),idx(kidx,3));
+    img(TOCTidx) = Data.OCT(OCTidx);
+    Data.TTPMpoints = round(TRANSFORM.b * Data.TPMpoints * TRANSFORM.T + TRANSFORM.c(1,:));
+    Data.TOCT = img;
+    
+    [D,Z,TRANSFORM] = procrustes(TPMpoints, OCTpoints);
+    Data.TransformA2T = TRANSFORM;
+    img = zeros(size(Data.OCT));
+    [Sz,Sx,Sy] = size(img);
+    [Az,Ax,Ay] = size(Data.TPM);
+%     TRANSFORM = Data.Transform;
+%     for u = 1:Sx
+%         for v = 1:Sy
+%             for w=1:Sz
+%                 idx = round(TRANSFORM.b * [w u v] * TRANSFORM.T + TRANSFORM.c(1,:));
+%                 if idx(1) < 1 || idx(1) > Az || idx(2) < 1 || idx(2) > Ax || idx(3) < 1 || idx(3) > Ay
+%                        img(w,u,v) = 0;
+%                 else
+% %                     img(w,u,v) = Data.TPM(min(max(idx(1),1),Az),min(max(idx(2),1),Ax),min(max(idx(3),1),Ay));
+%                       img(w,u,v) = Data.TPM(idx(1),idx(2),idx(3));
+%                 end
+%             end
+%         end
+%     end
+    [zz,xx,yy] = meshgrid(1:Sz,1:Sx,1:Sy);
+    idx = [zz(:) xx(:) yy(:)];
+    tidx = round(TRANSFORM.b * idx * TRANSFORM.T + TRANSFORM.c(1,:));
+    kidx = find(tidx(:,1) >= 1 & tidx(:,1) <= Az & tidx(:,2) >= 1 & tidx(:,2) <= Ax & tidx(:,3) >= 1 & tidx(:,3) <= Ay);
+    TPMidx = sub2ind(size(Data.TPM),tidx(kidx,1),tidx(kidx,2),tidx(kidx,3));
+    TTPMidx = sub2ind(size(img),idx(kidx,1),idx(kidx,2),idx(kidx,3));
+    img(TTPMidx) = Data.TPM(TPMidx);
+%     Data.TTPMpoints = round(TRANSFORM.b * Data.TPMpoints * TRANSFORM.T + TRANSFORM.c(1,:));
+%     Data.TOCT = img;
+    Data.TTPM = img;
+    Data.TOCTpoints = round(TRANSFORM.b * Data.OCTpoints * TRANSFORM.T + TRANSFORM.c(1,:));
+    toc
+end
+
 draw(hObject, eventdata, handles);
+
+
+function edit_a1Xstart_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a1Xstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a1Xstart as text
+%        str2double(get(hObject,'String')) returns contents of edit_a1Xstart as a double
+
+global Data
+if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
+    Tx = size(Data.TTPM,2);
+else
+    Tx = size(Data.TPM,2); 
+end
+ii = str2double(get(handles.edit_a1Xstart,'String'));
+% jj = Tx-ii+1;
+jj = min(max(ii,1),Tx);
+set(handles.slider_TIX,'Value',jj);
+draw(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_a1Xstart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a1Xstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a1XMIP_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a1XMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a1XMIP as text
+%        str2double(get(hObject,'String')) returns contents of edit_a1XMIP as a double
+
+draw(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_a1XMIP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a1XMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a1Ystart_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a1Ystart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a1Ystart as text
+%        str2double(get(hObject,'String')) returns contents of edit_a1Ystart as a double
+global Data
+if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
+    Ty = size(Data.TTPM,3);
+else
+    Ty = size(Data.TPM,3); 
+end
+ii = str2double(get(handles.edit_a1Ystart,'String'));
+% jj = Tx-ii+1;
+jj = min(max(ii,1),Ty);
+set(handles.slider_TIY,'Value',jj);
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_a1Ystart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a1Ystart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a1YMIP_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a1YMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a1YMIP as text
+%        str2double(get(hObject,'String')) returns contents of edit_a1YMIP as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_a1YMIP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a1YMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a1Zstart_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a1Zstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a1Zstart as text
+%        str2double(get(hObject,'String')) returns contents of edit_a1Zstart as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_a1Zstart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a1Zstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a1ZMIP_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a1ZMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a1ZMIP as text
+%        str2double(get(hObject,'String')) returns contents of edit_a1ZMIP as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_a1ZMIP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a1ZMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a2Xstart_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a2Xstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a2Xstart as text
+%        str2double(get(hObject,'String')) returns contents of edit_a2Xstart as a double
+global Data
+if get(handles.radiobutton_TOCT,'Value') == 1 && isfield(Data,'TOCT')
+    Ox = size(Data.TOCT,2);
+else
+    Ox = size(Data.OCT,2);
+end
+ii = str2double(get(handles.edit_a2Xstart,'String'));
+% jj = Tx-ii+1;
+jj = min(max(ii,1),Ox);
+set(handles.slider_AX,'Value',jj);
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_a2Xstart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a2Xstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a2XMIP_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a2XMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a2XMIP as text
+%        str2double(get(hObject,'String')) returns contents of edit_a2XMIP as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_a2XMIP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a2XMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a2Ystart_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a2Ystart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a2Ystart as text
+%        str2double(get(hObject,'String')) returns contents of edit_a2Ystart as a double
+global Data
+if get(handles.radiobutton_TOCT,'Value') == 1 && isfield(Data,'TOCT')
+    Oy = size(Data.TOCT,3);
+else
+    Oy = size(Data.OCT,3);
+end
+ii = str2double(get(handles.edit_a2Ystart,'String'));
+% jj = Tx-ii+1;
+jj = min(max(ii,1),Oy);
+set(handles.slider_AY,'Value',jj);
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_a2Ystart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a2Ystart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a2YMIP_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a2YMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a2YMIP as text
+%        str2double(get(hObject,'String')) returns contents of edit_a2YMIP as a double
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_a2YMIP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a2YMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a2Zstart_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a2Zstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a2Zstart as text
+%        str2double(get(hObject,'String')) returns contents of edit_a2Zstart as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_a2Zstart_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a2Zstart (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_a2ZMIP_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_a2ZMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_a2ZMIP as text
+%        str2double(get(hObject,'String')) returns contents of edit_a2ZMIP as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_a2ZMIP_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_a2ZMIP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on slider movement.
+function slider_TIX_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_TIX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global Data
+if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
+    Tx = size(Data.TTPM,2);
+else
+    Tx = size(Data.TPM,2); 
+end
+jj = round(get(handles.slider_TIX,'Value'));
+jj = min(max(jj,1),Tx);
+% ii = Tz-jj+1;
+set(handles.edit_a1Xstart,'String',num2str(jj));
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slider_TIX_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_TIX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider_TIY_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_TIY (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global Data
+if get(handles.radiobutton_TTPM,'Value') == 1 && isfield(Data,'TTPM')
+    Ty = size(Data.TTPM,3);
+else
+    Ty = size(Data.TPM,3); 
+end
+jj = round(get(handles.slider_TIY,'Value'));
+jj = min(max(jj,1),Ty);
+ii = Ty-jj+1;
+set(handles.edit_a1Ystart,'String',num2str(ii));
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slider_TIY_CreateFcn(hObject, eventdata, ~)
+% hObject    handle to slider_TIY (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider_AX_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_AX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global Data
+
+if get(handles.radiobutton_TOCT,'Value') == 1 && isfield(Data,'TOCT')
+    Ox = size(Data.TOCT,2);
+else
+    Ox = size(Data.OCT,2);
+end
+jj = round(get(handles.slider_AX,'Value'));
+jj = min(max(jj,1),Ox);
+% ii = Tz-jj+1;
+set(handles.edit_a2Xstart,'String',num2str(jj));
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slider_AX_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_AX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider_AY_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_AY (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+global Data
+
+if get(handles.radiobutton_TOCT,'Value') == 1 && isfield(Data,'TOCT')
+    Oy = size(Data.TOCT,3);
+else
+    Oy = size(Data.OCT,3);
+end
+jj = round(get(handles.slider_AY,'Value'));
+jj = min(max(jj,1),Oy);
+ii = Oy-jj+1;
+set(handles.edit_a2Ystart,'String',num2str(ii));
+draw(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slider_AY_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_AY (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider8_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_TIX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider8_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_TIX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider_TVX_Callback(hObject, eventdata, handles)
+% hObject    handle to slider_TVX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider_TVX_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider_TVX (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on button press in pushbutton_TPMmotionCorrection.
+function pushbutton_TPMmotionCorrection_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_TPMmotionCorrection (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global Data
+% hWait = waitbar( 0, 'Correcting motion' );
+nZ = size(Data.TPM,1);
+[optimizer, metric] = imregconfig('monomodal');
+tic
+for u = 1:nZ-1
+    u
+    Data.TPM(u+1,:,:) = imregister(squeeze(Data.TPM(u+1,:,:)), squeeze(Data.TPM(u,:,:)),'affine',optimizer,metric);
+%     waitbar(u/(nZ),hWait);
+%    [~,Data.TPM(u+1,:,:)]=imregdemons(squeeze(Data.TPM(u+1,:,:)),squeeze(Data.TPM(u,:,:)), ...
+%         [500 400 200],'AccumulatedFieldSmoothing', 1.3, 'DisplayWaitbar', false);
+%     tform = imregtform(squeeze(Data.TPM(u+1,:,:)), squeeze(Data.TPM(u,:,:)), 'affine', optimizer, metric);
+%     Data.TPM(u+1,:,:) = imwarp(squeeze(Data.TPM(u+1,:,:)),tform,'OutputView',imref2d(size(squeeze(Data.TPM(u,:,:)))));
+    toc
+end
+% close(hWait);
