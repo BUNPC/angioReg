@@ -1,5 +1,4 @@
-# angioReg
-register two volumetric angiograms together using an affine transformation then corrected by non-linear scattered data interpolation
+
 
 Description:
 This GUI is used to register two 3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points. This GUI will then perform the transformation of the images. The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. In the future, if requested, we can add non-linear registration algorithms. [Incorporate to work for 2D planes]
