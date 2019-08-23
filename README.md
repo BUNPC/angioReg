@@ -1,18 +1,18 @@
 
 
-Description:
-This GUI is used to register two 3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points. This GUI will then perform the transformation of the images. The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. In the future, if requested, we can add non-linear registration algorithms. [Incorporate to work for 2D planes]
+# Description:
+This GUI is used to register two 2D/3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points.The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. After Linear registartion, images may not align well due to motion or other types of non-linear transformations. To correct this, GUI has two nonlinear regsitration options using "imregdemons" and "scatteredInterpolant". This GUI will then perform the transformation of the images.
 
-Input: 
+# Input: 
 Angiogram image files
 Two file names are provided that contain the volumetric image of the two angiograms to be registered. The files can be MAT or TIF files. Please note that MAT files assume the image is ordered as z, x, and y; while the TIF files assume the image is ordered as x, y, and z. See the example files.
 
-Output: 
+# Output: 
 The following information can be saved from the GUI.
 
 pts2register.mat contains matching points used for the registration (‘pts2register’ is a user defined variable name, and can be arbitrarily names while saving the points.)
 Pts2register.mat has 2 variables:
-Angio1pts [Nx3] - contains 3D coordinates of the points on Angiogram1
+*Angio1pts [Nx3]* - contains 3D coordinates of the points on Angiogram1
 Angio2pts [Nx3] - contains 3D coordinates of the points on Angiogram2
 
 TransformedAngio1.mat contains the transformed angiogram1 into the angiogram2 space. The name ‘TransformedAngio1’ is user defined, and can be set while saving the transformed angiogram.
