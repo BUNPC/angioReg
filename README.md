@@ -10,18 +10,18 @@ Two file names are provided that contain the volumetric image of the two angiogr
 # Output: 
 The following information can be saved from the GUI.
 
-pts2register.mat contains matching points used for the registration (‘pts2register’ is a user defined variable name, and can be arbitrarily names while saving the points.)
-Pts2register.mat has 2 variables:
-*Angio1pts [Nx3]* - contains 3D coordinates of the points on Angiogram1
-Angio2pts [Nx3] - contains 3D coordinates of the points on Angiogram2
+pts2register.mat contains matching points used for the registration (‘pts2register’ is a user defined variable name, and can be arbitrarily names while saving the points.) <br/>
+Pts2register.mat has 2 variables: <br/>
+*Angio1pts [Nx3]* - contains 3D coordinates of the points on Angiogram1 <br/>
+*Angio2pts [Nx3]* - contains 3D coordinates of the points on Angiogram2
 
-TransformedAngio1.mat contains the transformed angiogram1 into the angiogram2 space. The name ‘TransformedAngio1’ is user defined, and can be set while saving the transformed angiogram.
-TransformedAngio1.mat has 1 variable:
-angio [Z2xX2xY2] - contains the transformed angiogram1 which has size of angiogram2. Z2, X2 and Y2 are the number of elements in angiogram2 in the Z, X and Y directions respectively.
+TransformedAngio1.mat contains the transformed angiogram1 into the angiogram2 space. The name ‘TransformedAngio1’ is user defined, and can be set while saving the transformed angiogram. <br/>
+TransformedAngio1.mat has 1 variable: <br/>
+*angio [Z2xX2xY2]* - contains the transformed angiogram1 which has size of angiogram2. Z2, X2 and Y2 are the number of elements in angiogram2 in the Z, X and Y directions respectively.
 
-TransformedAngio2.mat contains the transformed angiogram2 into angiogram1 space. The name ‘TransformedAngio2’ is user defined, and can be set while saving the transformed angiogram.
-TransformedAngio2.mat has 1 variable:
-angio [Z1xX1xY1] - contains the transformed angiogram2 which has size of angiogram1. Z1, X1 and Y1 are the number of elements in angiogram1 in the Z, X and Y directions respectively.
+TransformedAngio2.mat contains the transformed angiogram2 into angiogram1 space. The name ‘TransformedAngio2’ is user defined, and can be set while saving the transformed angiogram. <br/>
+TransformedAngio2.mat has 1 variable: <br/>
+*angio [Z1xX1xY1]* - contains the transformed angiogram2 which has size of angiogram1. Z1, X1 and Y1 are the number of elements in angiogram1 in the Z, X and Y directions respectively.
 
 # Instructions to run angioReg GUI:
 * Make sure KuraSuite is in your matlab path using the matlab command setpaths(path, genpath(cd)) from the KuraSuite root directory (or from the angioReg sub-directory).
