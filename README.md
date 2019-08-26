@@ -1,7 +1,7 @@
 
 
 # Description:
-This GUI is used to register two 2D/3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points.The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. After Linear registartion, images may not align well due to motion or other types of non-linear transformations. To correct this, GUI has two nonlinear regsitration options using "imregdemons" and "scatteredInterpolant". This GUI will then perform the transformation of the images.
+This GUI is used to register two 2D/3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points.This GUI will then perform the transformation of the images.The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. After Linear registartion, images may not align well due to motion or other types of non-linear transformations. To correct this, GUI has two nonlinear regsitration options using "imregdemons" and "scatteredInterpolant". 
 
 # Input: 
 Angiogram image files
@@ -23,11 +23,11 @@ TransformedAngio2.mat contains the transformed angiogram2 into angiogram1 space.
 TransformedAngio2.mat has 1 variable:
 angio [Z1xX1xY1] - contains the transformed angiogram2 which has size of angiogram1. Z1, X1 and Y1 are the number of elements in angiogram1 in the Z, X and Y directions respectively.
 
-Instructions to run angioReg GUI:
-Make sure KuraSuite is in your matlab path using the matlab command setpaths(path, genpath(cd)) from the KuraSuite root directory (or from the angioReg sub-directory).
-Change directory to the folder containing your data files.
+# Instructions to run angioReg GUI:
+Markup: 1. Make sure KuraSuite is in your matlab path using the matlab command setpaths(path, genpath(cd)) from the KuraSuite root directory (or from the angioReg sub-directory).
+2. Change directory to the folder containing your data files.
 Type angioReg in the MATLAB command window (Do not open by double clicking angioReg.fig. It will open the GUI but it may not function properly).
-To Load the angiograms go to Menu > Load Data
+3. To Load the angiograms go to Menu > Load Data
 A window prompt opens. Select the TIF or mat file that contains your first angiogram data.
 Another window prompt will open. Select the second TIF or mat file that contains your OCT or TPM data.
 Rotate 90 Anticlockwise,Rotate 90 clockwise and Transpose push buttons helps to orient the Angiogram2 such that it will be easy to identify identical points.
