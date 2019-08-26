@@ -27,7 +27,7 @@ angio [Z1xX1xY1] - contains the transformed angiogram2 which has size of angiogr
 * Make sure KuraSuite is in your matlab path using the matlab command setpaths(path, genpath(cd)) from the KuraSuite root directory (or from the angioReg sub-directory).
 * Change directory to the folder containing your data files.
 Type angioReg in the MATLAB command window (Do not open by double clicking angioReg.fig. It will open the GUI but it may not function properly).
-* To Load the angiograms go to <h3> File > Load Data </h3>
+* To Load the angiograms go to ** File > Load Data **
 * A window prompt opens. Select the TIF or mat file that contains your first angiogram data.
 * Another window prompt will open. Select the second TIF or mat file that contains your OCT or TPM data.
 * Rotate 90 Anticlockwise,Rotate 90 clockwise and Transpose push buttons helps to orient the Angiogram2 such that it will be easy to identify identical points.
