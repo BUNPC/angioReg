@@ -1,7 +1,7 @@
 
 
 # Description:
-This GUI is used to register two 2D/3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points.This GUI will then perform the transformation of the images.The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. After Linear registartion, images may not align well due to motion atrifacts or other types of non-linear transformations. To correct this, GUI has two nonlinear regsitration options using "imregdemons" and "scatteredInterpolant". 
+This GUI is used to register two 2D/3D angiograms by manually selecting matching points between the two angiograms. The Matlab function “procrustes” is used to create the affine transformation given these matching points.This GUI will then perform the transformation of the images.The image transformation is done with our own custom algorithm that is not optimized. We should adopt an optimized algorithm for 3D image transformation. After Linear registartion, images may not align well due to motion atrifacts or other types of non-linear transformations. To correct this, GUI has two nonlinear regsitration options using the matlab methods "imregdemons" and "scatteredInterpolant". 
 
 # Input: 
 Angiogram image files <br/>
