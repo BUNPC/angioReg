@@ -2087,7 +2087,7 @@ function file_saveTransformation_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global Data
 
-if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
+if isfield(Data,'TPMpoints') & isfield(Data,'OCTpoints')
     Transformation.DestinationPts = Data.TPMpoints;
     Transformation.SourcePts = Data.OCTpoints;
 end
@@ -2095,7 +2095,7 @@ if isfield(Data,'D2to1')
     Transformation.DisplacementField = Data.D2to1;
 end
 k = strfind(Data.SourcePath,filesep);
-save([Data.SourcePath(1:k(end)) 'Transformation.mat'],'Transformation');
+save([Data.SourcePath(1:k(end)) '
     
 
 

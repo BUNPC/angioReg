@@ -13,6 +13,6 @@ if get(Data.handles.radiobutton_removePoint,'Value')
         handles = Data.handles;
         hObject = Data.hObject;
         eventdata = Data.eventdata;
-        RegisterTPMandOCT('draw',hObject,eventdata,handles);
+        angioReg('draw',hObject,eventdata,handles);
     end
 end
