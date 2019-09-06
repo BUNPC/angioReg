@@ -19,6 +19,10 @@ Transformation.mat - It is an array of structures. Each structure may contain fo
 *DestinationPts [Nx3]* - contains 3D coordinates of the points on Angiogram1 <br/>
 *SourcePts [Nx3]* - contains 3D coordinates of the points on Angiogram2
 *D2to1 [Z2xX2xY2x3]* - contains displacement field of Angiogram2
+*Tlist2to1* - It is cell which contains type of operations performed in the order.
+*DestinationPath* - It is path to the  destination angiogram.
+*SourcePath* - It is path to the source angiogram.
+
 
 TransformedAngio1.mat contains the transformed angiogram1 into the angiogram2 space. The name ‘TransformedAngio1’ is user defined, and can be set while saving the transformed angiogram. <br/>
 TransformedAngio1.mat has 1 variable: <br/>
