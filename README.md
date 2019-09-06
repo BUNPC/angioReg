@@ -15,12 +15,12 @@ Pts2register.mat has 2 variables: <br/>
 *Angio1pts [Nx3]* - contains 3D coordinates of the points on Angiogram1 <br/>
 *Angio2pts [Nx3]* - contains 3D coordinates of the points on Angiogram2
 
-Transformation.mat - It is an array of structures. Each structure may contain following information.
+Transformation.mat - It is an array of structures. Each structure may contain following information. <br/>
 *DestinationPts [Nx3]* - contains 3D coordinates of the points on Angiogram1 <br/>
-*SourcePts [Nx3]* - contains 3D coordinates of the points on Angiogram2
-*D2to1 [Z2xX2xY2x3]* - contains displacement field of Angiogram2
-*Tlist2to1* - It is cell which contains type of operations performed in the order.
-*DestinationPath* - It is path to the  destination angiogram.
+*SourcePts [Nx3]* - contains 3D coordinates of the points on Angiogram2  <br/>
+*D2to1 [Z2xX2xY2x3]* - contains displacement field of Angiogram2  <br/>
+*Tlist2to1* - It is cell which contains type of operations performed in the order.  <br/>
+*DestinationPath* - It is path to the  destination angiogram. <br/>
 *SourcePath* - It is path to the source angiogram.
 
 
