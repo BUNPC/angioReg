@@ -15,7 +15,14 @@ Pts2register.mat has 2 variables: <br/>
 *Angio1pts [Nx3]* - contains 3D coordinates of the points on Angiogram1 <br/>
 *Angio2pts [Nx3]* - contains 3D coordinates of the points on Angiogram2
 
-Transformation.mat -
+Transformation.mat - It is an array of structures. Each structure may contain following information. <br/>
+*DestinationPts [Nx3]* - contains 3D coordinates of the points on Angiogram1 <br/>
+*SourcePts [Nx3]* - contains 3D coordinates of the points on Angiogram2  <br/>
+*D2to1 [Z2xX2xY2x3]* - contains displacement field of Angiogram2  <br/>
+*Tlist2to1* - It is cell which contains type of operations performed in the order.  <br/>
+*DestinationPath* - It is path to the  destination angiogram. <br/>
+*SourcePath* - It is path to the source angiogram.
+
 
 TransformedAngio1.mat contains the transformed angiogram1 into the angiogram2 space. The name ‘TransformedAngio1’ is user defined, and can be set while saving the transformed angiogram. <br/>
 TransformedAngio1.mat has 1 variable: <br/>
@@ -57,3 +64,8 @@ TransformedAngio2.mat has 1 variable: <br/>
   * Linear Registered Data (This option will only show if you have already did this registration)
   * Non-Linear registration using scattered Data interpolation (This option will only show if you have already did this registration)
 * To save transformed angiograms go to **File > Save Transformed angiogram1** or **File > Save Transformed angiogram2**
+
+# Tips
+* Always try linenar regisration and  non-linear registration (imregdemons) first. If this doesn't give you the results you want then try linenar regisration  and non-linear registration (Scattered data interpolation). 
+* If images already close enough without linear registration, then Lienar registration may not be necessary. Apply non-linear registraton method directly.
+* To register two volumes/images from same modality, most of the times non-linear registration (imregdemons) will give you the results you want. To register volumes/images from different modality, non-linear registration (imregdemons) may not work. In that case, use non-linear registration (Scattered data interpolation). 
