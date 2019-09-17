@@ -1774,6 +1774,7 @@ if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
     Data.LTTPM = img;
     [D,Z,TRANSFORM] = procrustes(OCTpoints,TPMpoints);
     Data.TTPMpoints = round(TRANSFORM.b * Data.TPMpoints * TRANSFORM.T + TRANSFORM.c(1,:));
+    Data.Tlist1to2{1} = 'L';
 end
 draw(hObject, eventdata, handles);
 
@@ -1813,6 +1814,7 @@ if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
     Data.TOCTpoints = round(TRANSFORM.b * Data.OCTpoints * TRANSFORM.T + TRANSFORM.c(1,:));
     Data.TOCT = img;
     Data.LTOCT = img;
+    Data.Tlist2to1{1} = 'L';
 end
 draw(hObject, eventdata, handles);
 
@@ -1855,6 +1857,7 @@ if isequal(lst{indx},'Raw Data')
     end
     Data.TTPM = TTPM;
     Data.NLSTTPM = TTPM;
+    Data.Tlist1to2{1} = 'NL-SDI'; 
 elseif isequal(lst{indx},'Linear Registered data')
     if size(Data.LTTPM,1) == 1
         Fx = scatteredInterpolant(Data.TTPMpoints(:,2:3),Data.OCTpoints(:,2));
@@ -1876,6 +1879,8 @@ elseif isequal(lst{indx},'Linear Registered data')
     end
     Data.TTPM = TTPM;
     Data.NLSTTPM = TTPM;
+    Data.Tlist1to2{1} = ['L']; 
+    Data.Tlist1to2{2} = ['NL-SDI']; 
 elseif isequal(lst{indx},'Non-Linear intensity based reg data')
     if size(Data.NLregTTPM,1) == 1
         Fx = scatteredInterpolant(Data.NLregTTPMpoints(:,2:3),Data.OCTpoints(:,2));
@@ -1897,6 +1902,7 @@ elseif isequal(lst{indx},'Non-Linear intensity based reg data')
     end
     Data.TTPM = TTPM;
     Data.NLSTTPM = TTPM;
+    Data.Tlist1to2{end+1} = 'NL-SDI'; 
 end
 draw(hObject, eventdata, handles);
 % --------------------------------------------------------------------
@@ -1937,6 +1943,7 @@ if isequal(lst{indx},'Raw Data')
     end
     Data.TOCT = TOCT;
     Data.NLSTOCT = TOCT;
+    Data.Tlist2to1{1} = 'NL-SDI'; 
 elseif isequal(lst{indx},'Linear Registered data')
     if size(Data.TOCT,1) == 1
         Fx = scatteredInterpolant(Data.TOCTpoints(:,2:3),Data.TPMpoints(:,2));
@@ -1953,12 +1960,16 @@ elseif isequal(lst{indx},'Linear Registered data')
                 TOCT(1,v,w) = mean(img(:));
             end
         end
-    else 
+    else
+        Fz = scatteredInterpolant(OCTpoints,T_Ts(:,1));
+        Fx = scatteredInterpolant(OCTpoints,T_Ts(:,2));
+        Fy = scatteredInterpolant(OCTpoints,T_Ts(:,3));
 
     end
     Data.TOCT = TOCT;
     Data.NLSTOCT = TOCT;
-    
+    Data.Tlist2to1{1} = 'L'; 
+    Data.Tlist2to1{2} = 'NL-SDI'; 
 elseif isequal(lst{indx},'Non-Linear intensity based reg data')
     if size(Data.NLregTOCT,1) == 1
         Fx = scatteredInterpolant(Data.NLregTOCTpoints(:,2:3),Data.TPMpoints(:,2));
@@ -1980,6 +1991,7 @@ elseif isequal(lst{indx},'Non-Linear intensity based reg data')
     end
     Data.TOCT = TOCT;
     Data.NLSTOCT = TOCT;
+    Data.Tlist2to1{end+1} = 'NL-SDI'; 
 end
 draw(hObject, eventdata, handles);
 % --------------------------------------------------------------------
@@ -1997,7 +2009,7 @@ if isfield(Data,'NLSTTPM')
     lst(end+1) = {'Non-Linear scattered data interplolted reg data'};
 end
 [indx,tf] = listdlg('PromptString','Perform on',...
-                           'SelectionMode','single',...
+                           'SelectionMode','single',...bg
                            'ListString',lst);
 if isequal(lst{indx},'Raw Data')
     [D,MOVING_REG] = imregdemons(squeeze(Data.TPM),squeeze(Data.OCT)); 
@@ -2006,15 +2018,19 @@ if isequal(lst{indx},'Raw Data')
         Data.NLregTOCTpoints(u,2) = Data.TPMpoints(u,2)+D(Data.NLregTTPMpoints(u,2),Data.NLregTTPMpoints(u,3),1);
         Data.NLregTOCTpoints(u,3) = Data.TPMpoints(u,3)+D(Data.NLregTTPMpoints(u,2),Data.NLregTTPMpoints(u,3),2);
     end
+    Data.Tlist1to2{1} = 'NL-imregdemon'; 
 elseif isequal(lst{indx},'Linear Registered data')
     [D,MOVING_REG] = imregdemons(squeeze(Data.TTPM),squeeze(Data.OCT));
     Data.NLregTTPMpoints = Data.TTPMpoints;
+    Data.Tlist1to2{1} = 'L'; 
+    Data.Tlist1to2{2}='NL-imregdemon';
 %     for u = 1:size(Data.TTPMpoints,1)
 %         Data.NLregTTPMpoints(u,2) = Data.TTPMpoints(u,2)+D(Data.TTPMpoints(u,2),Data.TTPMpoints(u,3),1);
 %         Data.NLregTTPMpoints(u,3) = Data.TTPMpoints(u,3)+D(Data.TTPMpoints(u,2),Data.TTPMpoints(u,3),2);
 %     end
 elseif isequal(lst{indx},'Non-Linear scattered data interplolted reg data')
     [D,MOVING_REG] = imregdemons(squeeze(Data.NLSTTPM),squeeze(Data.OCT));
+    Data.Tlist1to2{end+1} = 'NL-imregdemon';
 %     Data.NLregTTPMpoints = Data.TTPMpoints;
 %     for u = 1:size(Data.TTPMpoints,1)
 %         Data.NLregTTPMpoints(u,2) = Data.TTPMpoints(u,2)+D(Data.TTPMpoints(u,2),Data.TTPMpoints(u,3),1);
@@ -2057,16 +2073,20 @@ if isequal(lst{indx},'Raw Data')
         Data.NLregTOCTpoints(u,2) = Data.OCTpoints(u,2)+D(Data.NLregTOCTpoints(u,2),Data.NLregTOCTpoints(u,3),1);
         Data.NLregTOCTpoints(u,3) = Data.OCTpoints(u,3)+D(Data.NLregTOCTpoints(u,2),Data.NLregTOCTpoints(u,3),2);
     end
+    Data.Tlist2to1{1} = 'NL-imregdemon'; 
 elseif isequal(lst{indx},'Linear Registered data')   
     [D,MOVING_REG] = imregdemons(histeq(squeeze(Data.TOCT)),squeeze(Data.TPM));
-    MOVING_REG = imwarp(squeeze(Data.TOCT),D)
+    MOVING_REG = imwarp(squeeze(Data.TOCT),D);
     Data.NLregTOCTpoints = Data.TOCTpoints;
+    Data.Tlist2to1{1} = 'L'; 
+    Data.Tlist2to1{2} = 'NL-imregdemon'; 
 %     for u = 1:size(Data.TOCTpoints,1)
 %         Data.NLregTOCTpoints(u,2) = Data.TOCTpoints(u,2)+D(Data.TOCTpoints(u,2),Data.TOCTpoints(u,3),1);
 %         Data.NLregTOCTpoints(u,3) = Data.TOCTpoints(u,3)+D(Data.TOCTpoints(u,2),Data.TOCTpoints(u,3),2);
 %     end
 elseif isequal(lst{indx},'Non-Linear scattered data interplolted reg data')
     [D,MOVING_REG] = imregdemons(squeeze(Data.NLSTOCT),squeeze(Data.TPM));
+    Data.Tlist2to1{end+1} = 'NL-imregdemon';
 end
 if ismatrix(MOVING_REG)
     [Sx, Sy] = size(MOVING_REG);
@@ -2086,16 +2106,33 @@ function file_saveTransformation_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global Data
-
-if isfield(Data,'TPMpoints') & isfield(Data,'OCTpoints')
-    Transformation.DestinationPts = Data.TPMpoints;
-    Transformation.SourcePts = Data.OCTpoints;
+k = strfind(Data.SourcePath,filesep);
+filename = [Data.SourcePath(1:k(end)) 'Transformation.mat'];
+if isfile(filename)
+    load(filename,'Transformation')
+    v = 0;
+    for u = 1:length(Transformation)
+        v = v+1;
+        if Transformation(u).DestinationPath == Data.DestinationPath(1:k(end)-1)
+            break;
+        end
+    end
+else
+    v = 1;
+end
+if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
+    Transformation(v).DestinationPts = Data.TPMpoints;
+    Transformation(v).SourcePts = Data.OCTpoints;
 end
 if isfield(Data,'D2to1')
-    Transformation.DisplacementField = Data.D2to1;
+    Transformation(v).DisplacementField = Data.D2to1;
 end
-k = strfind(Data.SourcePath,filesep);
-save([Data.SourcePath(1:k(end)) '
+% if isfield(Data,'Tlist1to2')
+Transformation(v).Tlist2to1 = Data.Tlist2to1;
+% end
+Transformation(v).DestinationPath = Data.DestinationPath(1:k(end)-1);
+Transformation(v).SourcePath = Data.SourcePath(1:k(end)-1);
+save(filename,'Transformation');
     
 
 
