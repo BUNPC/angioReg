@@ -42,7 +42,7 @@ TransformedAngio2.mat has 1 variable: <br/>
 * Rotate 90 Anticlockwise,Rotate 90 clockwise and Transpose push buttons helps to orient the Angiogram2 such that it will be easy to identify identical points.
 * If needed, load previously selected points **File > Load points** or else go to the next step.
 * Select identical capillary segment bifurcation points on the first image (left axis) and the second image (right axis). To do this, select the Add radio button under image1. Pick a branching point you can easily identify on both images. Then use the Z slider on the right of both images to set your desired Z position for the point. Please set ZMIP to 1 for both volumes to unambiguously identify the z position of the points. Lastly, select the bifurcation point in both volumes with the mouse left click.
-* Repeat step 9 for at least 10 points. For best results, scatter the points uniformly throughout the volume. 
+* Repeat previous for at least 10 points. For best results, scatter the points uniformly throughout the volume. 
 * To delete points, select Remove in the button group under image 1 and then click on the number you’d like to remove. A window will appear that says “Would you like to delete point  x ?”. Select “Yes”
 * After selecting your points, save the results **File > Save points**. Note that you are advised to regularly save your work as you progress. You don’t need to wait until everything is selected before saving.
 * After selecting all desired points, go to the Tools menu to perform the Registration. There, you can choose to **Tools > Linear Registration > Angiogram 1 to 2** if you want to register angiogram1 to angiogram2 or **Tools > Linear Registration > Angiogram 2 to 1** if you want to register angiogram2 to angiogram1.
