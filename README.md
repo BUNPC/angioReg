@@ -67,5 +67,5 @@ TransformedAngio2.mat has 1 variable: <br/>
 
 # Tips
 * Always try linenar regisration and  non-linear registration (imregdemons) first. If this doesn't give you the results you want then try linenar regisration  and non-linear registration (Scattered data interpolation). 
-* If images already close enough without linear registration, then Lienar registration may not be necessary. Apply non-linear registraton method directly.
+* If images already close enough without linear registration, then Linear registration may not be necessary. Apply non-linear registraton method directly.
 * To register two volumes/images from same modality, most of the times non-linear registration (imregdemons) will give you the results you want. To register volumes/images from different modality, non-linear registration (imregdemons) may not work. In that case, use non-linear registration (Scattered data interpolation). 
