@@ -49,7 +49,7 @@ TransformedAngio2.mat has 1 variable: <br/>
 * Once the registration is complete, you can overlay the transformed image onto another using the Overlay check box. 
 * If Angiogram1 is registered to Angiogram2 then select Transformed Angiogram1 radio button and select the Overlay radiobutton. Axis1 will display Transformed Angiogram1 with gray color and Angiogram2 with green color overlay.
 * If Angiogram2 registered to Angiogram1 then select Transformed Angiogram2 radio button and select Overlay radiobutton. Axis1 will display Angiogram1 with gray color and Transformed Angiogram2 with green color overlay.
-* If there is non-linear transformation between the volumes you are trying register then might need to perform non-linear transformation. This GUI has 2 non-linear registration options. One is using matlab method imregdemons other using scatteredInterpolant.
+* If there is non-linear transformation between the volumes you are trying register then you might need to perform non-linear transformation. This GUI has 2 non-linear registration options. One is using matlab method imregdemons other using scatteredInterpolant.
 * Always try first using imregdemons. To perfrom this non-linear registration using this method go to **Tools > Non Linear Registartion (imregdemons) > Angiogram 1 to 2** if you want to register angiogram 1 to 2 or **Tools > Non Linear Registartion (imregdemons) > Angiogram 2 to 1** if you want to register angiogram 2 to 1.
 * If you select one of these two options, a list window will prompt opens. This list will have options to choose on which you can perform non-linear transformation. These options are
   * Raw data
