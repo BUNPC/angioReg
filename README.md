@@ -42,14 +42,14 @@ TransformedAngio2.mat has 1 variable: <br/>
 * Rotate 90 Anticlockwise,Rotate 90 clockwise and Transpose push buttons helps to orient the Angiogram2 such that it will be easy to identify identical points.
 * If needed, load previously selected points **File > Load points** or else go to the next step.
 * Select identical capillary segment bifurcation points on the first image (left axis) and the second image (right axis). To do this, select the Add radio button under image1. Pick a branching point you can easily identify on both images. Then use the Z slider on the right of both images to set your desired Z position for the point. Please set ZMIP to 1 for both volumes to unambiguously identify the z position of the points. Lastly, select the bifurcation point in both volumes with the mouse left click.
-* Repeat step 9 for at least 10 points. For best results, scatter the points uniformly throughout the volume. 
+* Repeat previous for at least 10 points. For best results, scatter the points uniformly throughout the volume. 
 * To delete points, select Remove in the button group under image 1 and then click on the number you’d like to remove. A window will appear that says “Would you like to delete point  x ?”. Select “Yes”
 * After selecting your points, save the results **File > Save points**. Note that you are advised to regularly save your work as you progress. You don’t need to wait until everything is selected before saving.
 * After selecting all desired points, go to the Tools menu to perform the Registration. There, you can choose to **Tools > Linear Registration > Angiogram 1 to 2** if you want to register angiogram1 to angiogram2 or **Tools > Linear Registration > Angiogram 2 to 1** if you want to register angiogram2 to angiogram1.
 * Once the registration is complete, you can overlay the transformed image onto another using the Overlay check box. 
 * If Angiogram1 is registered to Angiogram2 then select Transformed Angiogram1 radio button and select the Overlay radiobutton. Axis1 will display Transformed Angiogram1 with gray color and Angiogram2 with green color overlay.
 * If Angiogram2 registered to Angiogram1 then select Transformed Angiogram2 radio button and select Overlay radiobutton. Axis1 will display Angiogram1 with gray color and Transformed Angiogram2 with green color overlay.
-* If there is non-linear transformation between the volumes you are trying register then might need to perform non-linear transformation. This GUI has 2 non-linear registration options. One is using matlab method imregdemons other using scatteredInterpolant.
+* If there is non-linear transformation between the volumes you are trying register then you might need to perform non-linear transformation. This GUI has 2 non-linear registration options. One is using matlab method imregdemons other using scatteredInterpolant.
 * Always try first using imregdemons. To perfrom this non-linear registration using this method go to **Tools > Non Linear Registartion (imregdemons) > Angiogram 1 to 2** if you want to register angiogram 1 to 2 or **Tools > Non Linear Registartion (imregdemons) > Angiogram 2 to 1** if you want to register angiogram 2 to 1.
 * If you select one of these two options, a list window will prompt opens. This list will have options to choose on which you can perform non-linear transformation. These options are
   * Raw data
@@ -67,5 +67,5 @@ TransformedAngio2.mat has 1 variable: <br/>
 
 # Tips
 * Always try linenar regisration and  non-linear registration (imregdemons) first. If this doesn't give you the results you want then try linenar regisration  and non-linear registration (Scattered data interpolation). 
-* If images already close enough without linear registration, then Lienar registration may not be necessary. Apply non-linear registraton method directly.
+* If images already close enough without linear registration, then Linear registration may not be necessary. Apply non-linear registraton method directly.
 * To register two volumes/images from same modality, most of the times non-linear registration (imregdemons) will give you the results you want. To register volumes/images from different modality, non-linear registration (imregdemons) may not work. In that case, use non-linear registration (Scattered data interpolation). 
