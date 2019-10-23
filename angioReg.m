@@ -22,7 +22,7 @@ function varargout = angioReg(varargin)
 
 % Edit the above text to modify the response to help angioReg
 
-% Last Modified by GUIDE v2.5 29-Aug-2019 11:25:52
+% Last Modified by GUIDE v2.5 23-Oct-2019 16:25:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1954,8 +1954,10 @@ elseif isequal(lst{indx},'Linear Registered data')
             for w = 1:sY
                 tx = round(Fx(v,w));
                 ty = round(Fy(v,w));
-                xx = min(max(tx-1,1),sX):min(max(tx+1,1),sX);
-                yy = min(max(ty-1,1),sY):min(max(ty+1,1),sY);
+%                 xx = min(max(tx-1,1),sX):min(max(tx+1,1),sX);
+%                 yy = min(max(ty-1,1),sY):min(max(ty+1,1),sY);
+                xx = min(max(tx,1),sX);
+                yy = min(max(ty,1),sY);
                 img = Data.TOCT(1,xx,yy);
                 TOCT(1,v,w) = mean(img(:));
             end
@@ -2030,15 +2032,17 @@ end
                            'ListString',lst);
 if isequal(lst{indx},'Raw Data')
     [D,MOVING_REG] = imregdemons(squeeze(Data.TPM),squeeze(Data.OCT)); 
-    Data.NLregTTPMpoints = round(Data.TPMpoints);
-    for u = 1:size(Data.OCTpoints,1)
-        Data.NLregTOCTpoints(u,2) = Data.TPMpoints(u,2)+D(Data.NLregTTPMpoints(u,2),Data.NLregTTPMpoints(u,3),1);
-        Data.NLregTOCTpoints(u,3) = Data.TPMpoints(u,3)+D(Data.NLregTTPMpoints(u,2),Data.NLregTTPMpoints(u,3),2);
-    end
+%     Data.NLregTTPMpoints = round(Data.TPMpoints);
+%     for u = 1:size(Data.OCTpoints,1)
+%         Data.NLregTOCTpoints(u,2) = Data.TPMpoints(u,2)+D(Data.NLregTTPMpoints(u,2),Data.NLregTTPMpoints(u,3),1);
+%         Data.NLregTOCTpoints(u,3) = Data.TPMpoints(u,3)+D(Data.NLregTTPMpoints(u,2),Data.NLregTTPMpoints(u,3),2);
+%     end
     Data.Tlist1to2{1} = 'NL-imregdemon'; 
 elseif isequal(lst{indx},'Linear Registered data')
     [D,MOVING_REG] = imregdemons(squeeze(Data.TTPM),squeeze(Data.OCT));
-    Data.NLregTTPMpoints = Data.TTPMpoints;
+%     [D,MOVING_REG] = imregdemons(histeq(mat2gray(squeeze(Data.TTPM))),histeq(mat2gray(squeeze(Data.OCT))));
+%     MOVING_REG = imwarp(squeeze(Data.TTPM),D);
+%     Data.NLregTTPMpoints = Data.TTPMpoints;
     Data.Tlist1to2{1} = 'L'; 
     Data.Tlist1to2{2}='NL-imregdemon';
 %     for u = 1:size(Data.TTPMpoints,1)
@@ -2092,9 +2096,19 @@ if isequal(lst{indx},'Raw Data')
     end
     Data.Tlist2to1{1} = 'NL-imregdemon'; 
 elseif isequal(lst{indx},'Linear Registered data')   
+    if get(handles.radiobutton_nohist,'value')
+        [D,MOVING_REG] = imregdemons(squeeze(Data.TOCT),squeeze(Data.TPM));
+    elseif get(handles.radiobutton_hist,'value')
+        [D,~] = imregdemons(histeq(mat2gray(squeeze(Data.TOCT))),histeq(mat2gray(squeeze(Data.TPM))));
+        MOVING_REG = imwarp(squeeze(Data.TOCT),D);
+    elseif get(handles.radiobutton_adaptiveHist,'value')
+        [D,~] = imregdemons(adapthisteq(mat2gray(squeeze(Data.TOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
+        MOVING_REG = imwarp(squeeze(Data.TOCT),D);
+    end
+%     [D,MOVING_REG] = imregdemons(adapthisteq(mat2gray(squeeze(Data.TOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
 %     [D,MOVING_REG] = imregdemons(histeq(mat2gray(squeeze(Data.TOCT))),histeq(mat2gray(squeeze(Data.TPM))));
 %     MOVING_REG = imwarp(squeeze(Data.TOCT),D);
-    [D,MOVING_REG] = imregdemons(squeeze(Data.TOCT),squeeze(Data.TPM));
+%     [D,MOVING_REG] = imregdemons(squeeze(Data.TOCT),squeeze(Data.TPM));
     Data.NLregTOCTpoints = Data.TOCTpoints;
     Data.Tlist2to1{1} = 'L'; 
     Data.Tlist2to1{2} = 'NL-imregdemon'; 
@@ -2152,5 +2166,3 @@ Transformation(v).DestinationPath = Data.DestinationPath(1:k(end)-1);
 Transformation(v).SourcePath = Data.SourcePath(1:k(end)-1);
 save(filename,'Transformation');
     
-
-
