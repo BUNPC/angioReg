@@ -548,7 +548,7 @@ end
 if  get(handles.checkbox_overlay,'Value') == 1
 %     if (get(handles.radiobutton_TOCT,'Value') == 1 
         img2 = double(OCTimage);
-        img2 = 1-exp(-4*img2/max(img2(:)));
+        img2 = 1-exp(-5*img2/max(img2(:)));
         green = cat(3, zeros(size(img2)),ones(size(img2)), zeros(size(img2))); 
         hold on 
         h = imshow(green); 
@@ -2097,13 +2097,13 @@ if isequal(lst{indx},'Raw Data')
     Data.Tlist2to1{1} = 'NL-imregdemon'; 
 elseif isequal(lst{indx},'Linear Registered data')   
     if get(handles.radiobutton_nohist,'value')
-        [D,MOVING_REG] = imregdemons(squeeze(Data.TOCT),squeeze(Data.TPM));
+        [D,MOVING_REG] = imregdemons(squeeze(Data.LTOCT),squeeze(Data.TPM));
     elseif get(handles.radiobutton_hist,'value')
-        [D,~] = imregdemons(histeq(mat2gray(squeeze(Data.TOCT))),histeq(mat2gray(squeeze(Data.TPM))));
-        MOVING_REG = imwarp(squeeze(Data.TOCT),D);
+        [D,~] = imregdemons(histeq(mat2gray(squeeze(Data.LTOCT))),histeq(mat2gray(squeeze(Data.TPM))));
+        MOVING_REG = imwarp(squeeze(Data.LTOCT),D);
     elseif get(handles.radiobutton_adaptiveHist,'value')
-        [D,~] = imregdemons(adapthisteq(mat2gray(squeeze(Data.TOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
-        MOVING_REG = imwarp(squeeze(Data.TOCT),D);
+        [D,~] = imregdemons(adapthisteq(mat2gray(squeeze(Data.LTOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
+        MOVING_REG = imwarp(squeeze(Data.LTOCT),D);
     end
 %     [D,MOVING_REG] = imregdemons(adapthisteq(mat2gray(squeeze(Data.TOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
 %     [D,MOVING_REG] = imregdemons(histeq(mat2gray(squeeze(Data.TOCT))),histeq(mat2gray(squeeze(Data.TPM))));
