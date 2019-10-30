@@ -546,15 +546,6 @@ end
 
 
 if  get(handles.checkbox_overlay,'Value') == 1
-%     if (get(handles.radiobutton_TOCT,'Value') == 1 
-%         [Sx Sy] = size(TPMimage);
-%         RGB_img = zeros(Sx, Sy, 3);
-%         RGB_img(:,:,1) = TPMimage;
-%         RGB_img(:,:,2) = OCTimage;
-%         
-%         h = imagesc(OCTimage);
-%         colormap('jet');
-%         return
     img2 = double(OCTimage);
     img1 = TPMimage - min(TPMimage(:))/(max(TPMimage(:) - min(TPMimage(:))));
     img2 = img2 - min(img2(:))/(max(img2(:) - min(img2(:))));
@@ -563,13 +554,6 @@ if  get(handles.checkbox_overlay,'Value') == 1
     xlim([TI_Xstart TI_xend]);
     ylim([TI_Ystart TI_yend]);
     axis image;
-%         img2 = 1-exp(-5*img2/max(img2(:)));
-%         green = cat(3, zeros(size(img2)),ones(size(img2)), zeros(size(img2))); 
-%         hold on 
-%         h = imshow(green); 
-%         hold off
-%         set(h, 'AlphaData', img2) 
-%     end
 end
 
 
@@ -2153,16 +2137,19 @@ function file_saveTransformation_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global Data
+
+% save in source folder
 k = strfind(Data.SourcePath,filesep);
+clear Transformation
 filename = [Data.SourcePath(1:k(end)) 'Transformation.mat'];
 if isfile(filename)
     load(filename,'Transformation')
-    v = 0;
+    v = 1;
     for u = 1:length(Transformation)
-        v = v+1;
-        if Transformation(u).DestinationPath == Data.DestinationPath(1:k(end)-1)
+        if strcmp(Transformation(u).DestinationPath,Data.DestinationPath)
             break;
         end
+        v = v+1;
     end
 else
     v = 1;
@@ -2175,9 +2162,40 @@ if isfield(Data,'D2to1')
     Transformation(v).DisplacementField = Data.D2to1;
 end
 % if isfield(Data,'Tlist1to2')
-Transformation(v).Tlist2to1 = Data.Tlist2to1;
+Transformation(v).Tlist = Data.Tlist2to1;
 % end
-Transformation(v).DestinationPath = Data.DestinationPath(1:k(end)-1);
-Transformation(v).SourcePath = Data.SourcePath(1:k(end)-1);
+Transformation(v).DestinationPath = Data.DestinationPath;
+Transformation(v).SourcePath = Data.SourcePath;
 save(filename,'Transformation');
+
+% save in destination folder
+k = strfind(Data.DestinationPath,filesep);
+filename = [Data.DestinationPath(1:k(end)) 'Transformation.mat'];
+clear Transformation
+if isfile(filename)
+    load(filename,'Transformation')
+    v = 1;
+    for u = 1:length(Transformation)
+        if strcmp(Transformation(u).SourcePath,Data.SourcePath)
+            break;
+        end
+        v = v+1;
+    end
+else
+    v = 1;
+end
+if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
+    Transformation(v).SourcePts = Data.TPMpoints;
+    Transformation(v).DestinationPts = Data.OCTpoints;
+end
+% if isfield(Data,'D2to1')
+%     Transformation(v).DisplacementField = Data.D2to1;
+% end
+% if isfield(Data,'Tlist1to2')
+Transformation(v).Tlist = Data.Tlist2to1;
+% end
+Transformation(v).SourcePath = Data.DestinationPath;
+Transformation(v).DestinationPath = Data.SourcePath;
+save(filename,'Transformation');
+
     
