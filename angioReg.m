@@ -22,7 +22,7 @@ function varargout = angioReg(varargin)
 
 % Edit the above text to modify the response to help angioReg
 
-% Last Modified by GUIDE v2.5 23-Oct-2019 16:25:13
+% Last Modified by GUIDE v2.5 19-Nov-2019 09:19:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -548,7 +548,11 @@ end
 if  get(handles.checkbox_overlay,'Value') == 1
     img2 = double(OCTimage);
     img1 = TPMimage - min(TPMimage(:))/(max(TPMimage(:) - min(TPMimage(:))));
+    img1(img1>maxTPM) = maxTPM;
+    img1(img1<minTPM) = minTPM;
     img2 = img2 - min(img2(:))/(max(img2(:) - min(img2(:))));
+    img2(img2>maxOCT) = maxOCT;
+    img2(img2<minOCT) = minOCT;
     C =  imfuse(img1,img2, 'falsecolor','Scaling','joint','ColorChannels',[1 2 0]);
     imagesc(C)
     xlim([TI_Xstart TI_xend]);
@@ -2101,7 +2105,8 @@ elseif isequal(lst{indx},'Linear Registered data')
         [D,~] = imregdemons(histeq(mat2gray(squeeze(Data.LTOCT))),histeq(mat2gray(squeeze(Data.TPM))));
         MOVING_REG = imwarp(squeeze(Data.LTOCT),D);
     elseif get(handles.radiobutton_adaptiveHist,'value')
-        [D,~] = imregdemons(adapthisteq(mat2gray(squeeze(Data.LTOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
+        boxSize = str2double(get(handles.edit_AhistSize,'String'));
+        [D,~] = imregdemons(adapthisteq(mat2gray(squeeze(Data.LTOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[boxSize boxSize]));
         MOVING_REG = imwarp(squeeze(Data.LTOCT),D);
     end
 %     [D,MOVING_REG] = imregdemons(adapthisteq(mat2gray(squeeze(Data.TOCT)),'NumTiles',[75 75]),adapthisteq(mat2gray(squeeze(Data.TPM)),'NumTiles',[75 75]));
@@ -2188,9 +2193,9 @@ if isfield(Data,'TPMpoints') && isfield(Data,'OCTpoints')
     Transformation(v).SourcePts = Data.TPMpoints;
     Transformation(v).DestinationPts = Data.OCTpoints;
 end
-% if isfield(Data,'D2to1')
-%     Transformation(v).DisplacementField = Data.D2to1;
-% end
+if isfield(Data,'D1to2')
+    Transformation(v).DisplacementField = Data.D1to2;
+end
 % if isfield(Data,'Tlist1to2')
 Transformation(v).Tlist = Data.Tlist2to1;
 % end
@@ -2199,3 +2204,118 @@ Transformation(v).DestinationPath = Data.SourcePath;
 save(filename,'Transformation');
 
     
+
+
+
+function edit_img1lowpercentile_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_img1lowpercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_img1lowpercentile as text
+%        str2double(get(hObject,'String')) returns contents of edit_img1lowpercentile as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_img1lowpercentile_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_img1lowpercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_img1toppercentile_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_img1toppercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_img1toppercentile as text
+%        str2double(get(hObject,'String')) returns contents of edit_img1toppercentile as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_img1toppercentile_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_img1toppercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_img2lowpercentile_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_img2lowpercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_img2lowpercentile as text
+%        str2double(get(hObject,'String')) returns contents of edit_img2lowpercentile as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_img2lowpercentile_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_img2lowpercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_img2toppercentile_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_img2toppercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_img2toppercentile as text
+%        str2double(get(hObject,'String')) returns contents of edit_img2toppercentile as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_img2toppercentile_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_img2toppercentile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_AhistSize_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_AhistSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_AhistSize as text
+%        str2double(get(hObject,'String')) returns contents of edit_AhistSize as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_AhistSize_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_AhistSize (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
