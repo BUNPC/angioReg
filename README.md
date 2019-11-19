@@ -51,6 +51,11 @@ TransformedAngio2.mat has 1 variable: <br/>
 * If Angiogram2 registered to Angiogram1 then select Transformed Angiogram2 radio button and select Overlay radiobutton. Axis1 will display Angiogram1 with gray color and Transformed Angiogram2 with green color overlay.
 * If there is non-linear transformation between the volumes you are trying register then you might need to perform non-linear transformation. This GUI has 2 non-linear registration options. One is using matlab method imregdemons other using scatteredInterpolant.
 * Always try first using imregdemons. To perfrom this non-linear registration using this method go to **Tools > Non Linear Registartion (imregdemons) > Angiogram 1 to 2** if you want to register angiogram 1 to 2 or **Tools > Non Linear Registartion (imregdemons) > Angiogram 2 to 1** if you want to register angiogram 2 to 1.
+* For non linear registration using imregdemons, there are few options available.
+  * No histogram equalization
+  * Histogram equalization
+  * Adaptive histogram equalization
+* It is recommended to try all these options to see which works best. 
 * If you select one of these two options, a list window will prompt opens. This list will have options to choose on which you can perform non-linear transformation. These options are
   * Raw data
   * Linear Registered Data (This option will only show if you have already did this registration)
@@ -64,6 +69,7 @@ TransformedAngio2.mat has 1 variable: <br/>
   * Linear Registered Data (This option will only show if you have already did this registration)
   * Non-Linear registration using scattered Data interpolation (This option will only show if you have already did this registration)
 * To save transformed angiograms go to **File > Save Transformed angiogram1** or **File > Save Transformed angiogram2**
+* To save transformation information go to **File > Save Transformation**. This will save Transformation.mat file in both source and destination folders.
 
 # Tips
 * Always try linenar regisration and  non-linear registration (imregdemons) first. If this doesn't give you the results you want then try linenar regisration  and non-linear registration (Scattered data interpolation). 
