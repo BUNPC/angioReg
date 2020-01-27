@@ -47,6 +47,7 @@ end
 % --- Executes just before angioReg is made visible.
 function angioReg_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
+
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -547,10 +548,10 @@ end
 
 if  get(handles.checkbox_overlay,'Value') == 1
     img2 = double(OCTimage);
-    img1 = TPMimage - min(TPMimage(:))/(max(TPMimage(:) - min(TPMimage(:))));
+    img1 = (TPMimage - min(TPMimage(:)))/(max(TPMimage(:) - min(TPMimage(:))));
     img1(img1>maxTPM) = maxTPM;
     img1(img1<minTPM) = minTPM;
-    img2 = img2 - min(img2(:))/(max(img2(:) - min(img2(:))));
+    img2 = (img2 - min(img2(:)))/(max(img2(:) - min(img2(:))));
     img2(img2>maxOCT) = maxOCT;
     img2(img2<minOCT) = minOCT;
     C =  imfuse(img1,img2, 'falsecolor','Scaling','joint','ColorChannels',[1 2 0]);
